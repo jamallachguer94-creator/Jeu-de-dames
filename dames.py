@@ -282,15 +282,55 @@ class Pion(Piece):
 
         return resultats
 
-    # --- Étape 6
+    
+# --- Étape 5 : la dame ---------------------------------------------------------------------------
+class Dame(Piece):
+    LETTRE = "D"
+    NOM = "dame"
+    FEMININ = True
+
+    def deplacements(self, case, plateau):
+        """La dame se déplace en diagonale sur toute case libre."""
+        resultats = set()
+
+        for dc, dl in DIAGONALES:
+            arrivee = case.decaler(dc, dl)
+
+            while arrivee is not None and arrivee not in plateau:
+                resultats.add(arrivee)
+                arrivee = arrivee.decaler(dc, dl)
+
+        return resultats
+
+    def prises(self, case, plateau):
+        """La dame capture la première pièce adverse rencontrée sur une diagonale."""
+        resultats = {}
+
+        for dc, dl in DIAGONALES:
+            courante = case.decaler(dc, dl)
+
+            while courante is not None:
+                piece = plateau[courante]
+
+                if piece is None:
+                    courante = courante.decaler(dc, dl)
+                    continue
+
+                if self.est_adverse(piece):
+                    arrivee = courante.decaler(dc, dl)
+
+                    while arrivee is not None and arrivee not in plateau:
+                        resultats[arrivee] = courante
+                        arrivee = arrivee.decaler(dc, dl)
+
+                break
+
+        return resultats   
+
+# --- Étape 6
     def promouvoir(self, case):
         """Sur la dernière ligne (10 pour les blancs, 1 pour les noirs), le pion devient dame."""
         raise NotImplementedError("à compléter")
-
-
-# --- Étape 5 : la dame ---------------------------------------------------------------------------
-# À vous : écrivez ici la classe Dame (énoncé, étape 5).
-
 
 # --- Étape 7 : la partie -------------------------------------------------------------------------
 @dataclass(frozen=True)
