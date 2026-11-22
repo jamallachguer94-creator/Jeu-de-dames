@@ -250,11 +250,37 @@ class Pion(Piece):
 
     def deplacements(self, case, plateau):
         """Une case en diagonale, vers l'avant, si elle est libre."""
-        raise NotImplementedError("à compléter")
+        resultats = set()
+
+        for dc in (-1, 1):
+            arrivee = case.decaler(dc, self.sens)
+
+            if arrivee is not None and arrivee not in plateau:
+                resultats.add(arrivee)
+
+        return resultats
 
     def prises(self, case, plateau):
         """Sauter une pièce adverse voisine (avant ou arrière) vers la case libre derrière."""
-        raise NotImplementedError("à compléter")
+        resultats = {}
+
+        for dc, dl in DIAGONALES:
+            milieu = case.decaler(dc, dl)
+
+            if milieu is None:
+                continue
+
+            piece = plateau[milieu]
+
+            if piece is None or not self.est_adverse(piece):
+                continue
+
+            arrivee = case.decaler(2 * dc, 2 * dl)
+
+            if arrivee is not None and arrivee not in plateau:
+                resultats[arrivee] = milieu
+
+        return resultats
 
     # --- Étape 6
     def promouvoir(self, case):
